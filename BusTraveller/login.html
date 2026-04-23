@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Laxmi Holidays</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.7)),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-wrapper {
+      width: 100%;
+      max-width: 980px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .auth-left {
+      padding: 60px 50px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(216, 78, 85, 0.82), rgba(139, 45, 79, 0.82));
+    }
+
+    .brand {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .auth-left h1 {
+      font-size: 42px;
+      line-height: 1.2;
+      margin-bottom: 18px;
+    }
+
+    .auth-left p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #f8fafc;
+      max-width: 420px;
+      margin-bottom: 28px;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 14px;
+      font-size: 15px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+      flex-shrink: 0;
+    }
+
+    .auth-right {
+      background: white;
+      padding: 42px 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .auth-card h2 {
+      font-size: 30px;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+
+    .auth-card .subtext {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      outline: none;
+      font-size: 15px;
+      transition: 0.2s;
+      background: #fff;
+    }
+
+    .form-input:focus {
+      border-color: #d84e55;
+      box-shadow: 0 0 0 4px rgba(216, 78, 85, 0.12);
+    }
+
+    .primary-btn {
+      width: 100%;
+      height: 50px;
+      border: none;
+      border-radius: 12px;
+      background: #d84e55;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 10px;
+    }
+
+    .primary-btn:hover {
+      background: #bf3f46;
+      transform: translateY(-1px);
+    }
+
+    .bottom-text {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    .bottom-text a {
+      color: #d84e55;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .bottom-text a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      .auth-wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-left {
+        padding: 36px 26px;
+      }
+
+      .auth-left h1 {
+        font-size: 32px;
+      }
+
+      .auth-right {
+        padding: 30px 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-left">
+      <div class="brand">LAXMI HOLIDAYS</div>
+      <h1>Welcome back to smarter bus travel</h1>
+      <p>
+        Log in to manage your bookings, choose seats in real time, track routes,
+        and enjoy a smooth travel experience across India.
+      </p>
+
+      <div class="feature-list">
+        <div class="feature-item"><span class="dot"></span><span>Live seat selection</span></div>
+        <div class="feature-item"><span class="dot"></span><span>Instant booking history</span></div>
+        <div class="feature-item"><span class="dot"></span><span>Easy cancellation and route access</span></div>
+      </div>
+    </div>
+
+    <div class="auth-right">
+      <div class="auth-card">
+        <h2>Login</h2>
+        <p class="subtext">Enter your account details to continue your journey.</p>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" type="email" id="email" placeholder="Enter your email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="Enter your password" />
+        </div>
+
+        <button type="button" class="primary-btn" id="loginBtn" onclick="loginUser()">
+  Login
+</button>
+
+        <p class="bottom-text">
+          Don’t have an account?
+          <a href="signup.html">Signup</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>

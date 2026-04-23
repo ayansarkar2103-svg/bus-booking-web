@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bus Seat Selection</title>
+
+  <script>
+    if (!localStorage.getItem("user")) {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+
+    .header {
+      background: #d84e55;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .top-bar {
+      background: white;
+      padding: 22px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .search-box {
+      max-width: 980px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr 180px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .field,
+    .select-field {
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 15px;
+      outline: none;
+      width: 100%;
+    }
+
+    .field:focus,
+    .select-field:focus {
+      border-color: #d84e55;
+      box-shadow: 0 0 0 3px rgba(216, 78, 85, 0.12);
+    }
+
+    .swap-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #e5e7eb;
+      background: white;
+      color: #d84e55;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+      transition: 0.2s;
+    }
+
+    .swap-btn:hover {
+      background: #fff1f2;
+      transform: rotate(180deg);
+    }
+
+    .page-wrap {
+      max-width: 1280px;
+      margin: 34px auto;
+      padding: 0 18px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .seat-panel,
+    .summary-panel {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border: 1px solid #eef2f7;
+    }
+
+    .seat-panel {
+      padding: 26px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .bus-type {
+      font-size: 14px;
+      color: #6b7280;
+      background: #f9fafb;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .bus-time-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .time-card {
+      background: #fff5f5;
+      border: 1px solid #ffe2e2;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .time-card h4 {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .time-card p {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .seat-section-title {
+      margin: 18px 0 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .bus-layout-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .bus-shell {
+      width: 360px;
+      border: 2px solid #e5e7eb;
+      border-radius: 24px;
+      padding: 22px 18px 18px;
+      position: relative;
+      background: linear-gradient(to bottom, #ffffff, #fafafa);
+    }
+
+    .bus-front {
+      width: 80px;
+      height: 18px;
+      border-radius: 999px;
+      background: #eef2f7;
+      margin: 0 auto 18px;
+    }
+
+    .driver-box {
+      position: absolute;
+      top: 52px;
+      right: 24px;
+      width: 42px;
+      height: 42px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+      font-size: 18px;
+    }
+
+    .seats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .seat {
+      width: 42px;
+      height: 42px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      text-align: center;
+      line-height: 42px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s;
+      user-select: none;
+      background: white;
+      color: #334155;
+    }
+
+    .seat:hover {
+      border-color: #d84e55;
+    }
+
+    .seat.selected {
+      background: #1ba672;
+      color: white;
+      border-color: #1ba672;
+    }
+
+    .seat.booked {
+      background: #d1d5db;
+      color: #6b7280;
+      border-color: #d1d5db;
+      cursor: not-allowed;
+    }
+
+    .aisle {
+      visibility: hidden;
+    }
+
+    .sleeper-layout {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .sleeper-seat {
+      min-height: 60px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .sleeper-seat:hover {
+      border-color: #7c3aed;
+    }
+
+    .sleeper-seat.selected {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .sleeper-seat.booked {
+      background: #d1d5db;
+      color: #6b7280;
+      border-color: #d1d5db;
+      cursor: not-allowed;
+    }
+
+    .legend {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .legend-box {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: white;
+    }
+
+    .legend-box.selected {
+      background: #1ba672;
+      border-color: #1ba672;
+    }
+
+    .legend-box.booked {
+      background: #d1d5db;
+      border-color: #d1d5db;
+    }
+
+    .legend-box.sleeper {
+      background: #ede9fe;
+      border-color: #c4b5fd;
+    }
+
+    .form-grid {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .form-card {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .form-card h3 {
+      font-size: 18px;
+      margin-bottom: 14px;
+      color: #111827;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-panel {
+      padding: 26px;
+      position: sticky;
+      top: 110px;
+    }
+
+    .summary-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: #111827;
+    }
+
+    .route-box {
+      background: #fff5f5;
+      border: 1px solid #ffe2e2;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .route-main {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .route-sub {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 14px;
+      margin: 18px 0 24px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      color: #374151;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .info-row strong {
+      color: #111827;
+      text-align: right;
+    }
+
+    .selected-seat-pill {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      max-width: 220px;
+    }
+
+    .pill {
+      background: #eef2ff;
+      color: #4338ca;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .total-box {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .total-box .label {
+      color: #6b7280;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .total-box .amount {
+      font-size: 30px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .cta-btn {
+      width: 100%;
+      padding: 15px;
+      background: #d84e55;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .cta-btn:hover {
+      background: #bf3f46;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 960px) {
+      .search-box,
+      .page-wrap,
+      .form-grid,
+      .bus-time-box {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-panel {
+        position: static;
+      }
+
+      .bus-shell {
+        width: 100%;
+        max-width: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">Bus Seat Selection</div>
+
+  <div class="top-bar">
+    <div class="search-box">
+      <input class="field" type="text" id="from" placeholder="From" />
+      <button class="swap-btn" onclick="swapCities()">⇄</button>
+      <input class="field" type="text" id="to" placeholder="To" />
+      <input class="field" type="date" id="date" />
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="seat-panel">
+      <div class="panel-header">
+        <div class="panel-title" id="operatorTitle">Laxmi Holidays Express</div>
+        <div class="bus-type" id="busTypeText">Seater + Sleeper • Premium AC</div>
+      </div>
+
+      <div class="bus-time-box">
+        <div class="time-card">
+          <h4>Departure</h4>
+          <p id="departureTime">N/A</p>
+        </div>
+        <div class="time-card">
+          <h4>Arrival</h4>
+          <p id="arrivalTime">N/A</p>
+        </div>
+        <div class="time-card">
+          <h4>Duration</h4>
+          <p id="durationTime">N/A</p>
+        </div>
+      </div>
+
+      <div class="seat-section-title">Seater Seats</div>
+      <div class="bus-layout-wrap">
+        <div class="bus-shell">
+          <div class="bus-front"></div>
+          <div class="driver-box">🪑</div>
+          <div id="seatContainer" class="seats"></div>
+        </div>
+      </div>
+
+      <div class="seat-section-title">Sleeper Berths</div>
+      <div id="sleeperContainer" class="sleeper-layout"></div>
+
+      <div class="legend">
+        <div class="legend-item"><div class="legend-box"></div><span>Available Seater</span></div>
+        <div class="legend-item"><div class="legend-box sleeper"></div><span>Available Sleeper</span></div>
+        <div class="legend-item"><div class="legend-box selected"></div><span>Selected</span></div>
+        <div class="legend-item"><div class="legend-box booked"></div><span>Booked</span></div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-card">
+          <h3>Boarding & Dropping</h3>
+          <div class="field-group">
+            <select id="boardingPoint" class="select-field">
+              <option value="">Select Boarding Point</option>
+            </select>
+
+            <select id="droppingPoint" class="select-field">
+              <option value="">Select Dropping Point</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h3>Passenger Details</h3>
+          <div class="field-group">
+            <input type="text" id="passengerName" class="field" placeholder="Passenger Name">
+            <input type="number" id="passengerAge" class="field" placeholder="Age">
+            <select id="passengerGender" class="select-field">
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            <input type="text" id="phone" class="field" placeholder="Phone Number">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-panel">
+      <div class="summary-title">Booking Summary</div>
+
+      <div class="route-box">
+        <div class="route-main" id="routeText">Choose your route</div>
+        <div class="route-sub" id="dateText">Select travel date to continue</div>
+      </div>
+
+      <div class="info-list">
+        <div class="info-row">
+          <span>Selected Seats</span>
+          <strong id="selectedSeats">None</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Seat Numbers</span>
+          <div class="selected-seat-pill" id="seatPills">
+            <span class="pill">None</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <span>Seat Type</span>
+          <strong id="seatTypeSummary">None</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Bus Operator</span>
+          <strong id="operatorSummary">Laxmi Holidays Express</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Departure</span>
+          <strong id="departureSummary">N/A</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Arrival</span>
+          <strong id="arrivalSummary">N/A</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Duration</span>
+          <strong id="durationSummary">N/A</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Boarding</span>
+          <strong id="boardingSummary">Not selected</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Dropping</span>
+          <strong id="droppingSummary">Not selected</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Passenger</span>
+          <strong id="passengerSummary">Not added</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Seater Price</span>
+          <strong>₹ <span id="seaterPrice">500</span></strong>
+        </div>
+
+        <div class="info-row">
+          <span>Sleeper Price</span>
+          <strong>₹ <span id="sleeperPrice">900</span></strong>
+        </div>
+      </div>
+
+      <div class="total-box">
+        <div class="label">Total Payable</div>
+        <div class="amount">₹ <span id="totalPrice">0</span></div>
+      </div>
+
+      <button class="cta-btn" onclick="bookBus()">Proceed to Pay</button>
+    </div>
+  </div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="trip.js"></script>
+</body>
+</html>

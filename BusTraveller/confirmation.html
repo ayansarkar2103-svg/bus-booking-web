@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Confirmation</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "DM Sans", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #edf4ff, #f7faff, #eef6ff);
+      min-height: 100vh;
+      color: #1f2937;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand .icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2887ff, #0f4cdb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 8px 20px rgba(40, 135, 255, 0.25);
+    }
+
+    .brand h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .brand p {
+      color: #64748b;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons button,
+    .action-buttons a {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, #2563eb, #2887ff);
+      color: white;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+    }
+
+    .download-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .cancel-btn {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: white;
+      box-shadow: 0 8px 18px rgba(220, 38, 38, 0.22);
+    }
+
+    .cancel-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .home-btn {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #dbe7ff;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .home-btn:hover {
+      background: #f8fbff;
+      transform: translateY(-2px);
+    }
+
+    .confirmation-banner {
+      background: linear-gradient(135deg, #0f4cdb, #2887ff);
+      border-radius: 24px;
+      padding: 28px;
+      color: white;
+      box-shadow: 0 15px 35px rgba(40, 135, 255, 0.2);
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .confirmation-banner .left h2 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .confirmation-banner .left p {
+      font-size: 15px;
+      opacity: 0.95;
+      line-height: 1.7;
+    }
+
+    .status-box {
+      background: whitesmoke;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(8px);
+      padding: 18px 22px;
+      border-radius: 18px;
+      min-width: 220px;
+      align-self: center;
+    }
+
+    .status-box span {
+      display: block;
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      color: black;
+    }
+
+    .status-box strong {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .ticket-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .ticket-card,
+    .side-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #e2ebff;
+      border-radius: 28px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.07);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .ticket-header {
+      background: linear-gradient(135deg, #eff6ff, #f8fbff);
+      padding: 24px 28px;
+      border-bottom: 1px solid #e5eefc;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .ticket-header h3 {
+      font-size: 24px;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .ticket-header p {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .ticket-id-box {
+      background: white;
+      border: 1px solid #dce8ff;
+      border-radius: 18px;
+      padding: 14px 18px;
+      min-width: 200px;
+    }
+
+    .ticket-id-box span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .ticket-id-box strong {
+      color: #0f172a;
+      font-size: 18px;
+    }
+
+    .route-section {
+      padding: 28px;
+      border-bottom: 1px dashed #d7e5ff;
+    }
+
+    .route-top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .place h2 {
+      font-size: 28px;
+      color: #0f172a;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .place p {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .route-line {
+      text-align: center;
+      color: #2887ff;
+    }
+
+    .route-line i {
+      font-size: 34px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .route-line span {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .info-grid {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      border-bottom: 1px dashed #d7e5ff;
+    }
+
+    .info-box {
+      background: #f8fbff;
+      border: 1px solid #e2ebff;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .info-box span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .info-box strong {
+      font-size: 17px;
+      color: #0f172a;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .passenger-section {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      border-bottom: 1px dashed #d7e5ff;
+    }
+
+    .payment-section {
+      padding: 28px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 18px;
+    }
+
+    .payment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .fare-highlight {
+      background: linear-gradient(135deg, #e8f1ff, #f6faff);
+      border: 1px solid #d8e7ff;
+    }
+
+    .fare-highlight strong {
+      color: #0f4cdb;
+      font-size: 22px;
+    }
+
+    .ticket-footer {
+      background: #f8fbff;
+      border-top: 1px solid #e5eefc;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .ticket-footer p {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .qr-box {
+      width: 90px;
+      height: 90px;
+      border-radius: 16px;
+      background: repeating-linear-gradient(
+        45deg,
+        #111827,
+        #111827 8px,
+        #ffffff 8px,
+        #ffffff 16px
+      );
+      border: 6px solid white;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .side-card {
+      padding: 24px;
+      height: fit-content;
+    }
+
+    .side-card + .side-card {
+      margin-top: 20px;
+    }
+
+    .mini-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 16px;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary-item {
+      background: #f8fbff;
+      border: 1px solid #e2ebff;
+      border-radius: 16px;
+      padding: 14px 15px;
+    }
+
+    .summary-item span {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .summary-item strong {
+      font-size: 15px;
+      color: #0f172a;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .important-note {
+      margin-top: 20px;
+      padding: 16px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      color: #9a3412;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 900px) {
+      .ticket-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .route-top,
+      .info-grid,
+      .passenger-section,
+      .payment-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .place h2 {
+        font-size: 23px;
+      }
+
+      .ticket-header,
+      .ticket-footer,
+      .confirmation-banner {
+        padding: 20px;
+      }
+
+      .route-section,
+      .info-grid,
+      .passenger-section,
+      .payment-section {
+        padding: 20px;
+      }
+
+      .brand h1 {
+        font-size: 22px;
+      }
+
+      .confirmation-banner .left h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="icon">
+          <i class="ri-bus-2-fill"></i>
+        </div>
+        <div>
+          <h1>Booking Confirmation</h1>
+          <p>Your premium ticket details are ready</p>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="download-btn" onclick="window.print()">
+          <i class="ri-download-2-line"></i> Download Ticket
+        </button>
+
+        <button class="cancel-btn" id="cancelTicketBtn">
+          <i class="ri-close-circle-line"></i> Cancel Ticket
+        </button>
+
+        <a href="index.html" class="home-btn">
+          <i class="ri-home-5-line"></i> Back to Home
+        </a>
+      </div>
+    </div>
+
+    <div class="confirmation-banner">
+      <div class="left">
+        <h2>Ticket Generated Successfully</h2>
+        <p>
+          Your booking has been completed successfully. A confirmation email with
+          attached ticket has been sent to your registered email address.
+        </p>
+      </div>
+
+      <div class="status-box">
+        <span>Current Status</span>
+        <strong id="status">CONFIRMED</strong>
+      </div>
+    </div>
+
+    <div class="ticket-layout">
+      <!-- LEFT MAIN TICKET -->
+      <div class="ticket-card">
+        <div class="ticket-header">
+          <div>
+            <h3 id="operatorName">Luxury Travels</h3>
+            <p id="seatType">Seater + Sleeper • Premium AC</p>
+          </div>
+
+          <div class="ticket-id-box">
+            <span>Ticket ID</span>
+            <strong id="ticketId">LH000000</strong>
+          </div>
+        </div>
+
+        <div class="route-section">
+          <div class="route-top">
+            <div class="place">
+              <h2 id="from">Kolkata</h2>
+              <p>Departure: <span id="departureTime">N/A</span></p>
+            </div>
+
+            <div class="route-line">
+              <i class="ri-arrow-right-line"></i>
+              <span id="durationTime">N/A</span>
+            </div>
+
+            <div class="place" style="text-align: right;">
+              <h2 id="to">Digha</h2>
+              <p>Arrival: <span id="arrivalTime">N/A</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-box">
+            <span>Travel Date</span>
+            <strong id="date">N/A</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Route</span>
+            <strong id="route">N/A</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Boarding Point</span>
+            <strong id="boardingPoint">N/A</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Dropping Point</span>
+            <strong id="droppingPoint">N/A</strong>
+          </div>
+        </div>
+
+        <div class="passenger-section">
+          <div class="info-box">
+            <span>Passenger Name</span>
+            <strong id="name">Passenger</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Email Address</span>
+            <strong id="email">N/A</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Seat Number(s)</span>
+            <strong id="seats">N/A</strong>
+          </div>
+
+          <div class="info-box">
+            <span>Bus Type</span>
+            <strong id="seatTypeText">N/A</strong>
+          </div>
+        </div>
+
+        <div class="payment-section">
+          <div class="section-title">Payment & Booking Details</div>
+
+          <div class="payment-grid">
+            <div class="info-box">
+              <span>Payment ID</span>
+              <strong id="paymentId">N/A</strong>
+            </div>
+
+            <div class="info-box fare-highlight">
+              <span>Total Paid</span>
+              <strong id="total">₹0</strong>
+            </div>
+
+            <div class="info-box">
+              <span>Operator (Duplicate)</span>
+              <strong id="operatorNameDuplicate">Luxury Travels</strong>
+            </div>
+
+            <div class="info-box">
+              <span>Departure Time (Duplicate)</span>
+              <strong id="departureTimeDuplicate">N/A</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticket-footer">
+          <p>
+            Please carry a valid government ID during boarding. Reach the boarding
+            point at least 15 minutes before departure.
+          </p>
+          <div class="qr-box"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div>
+        <div class="side-card">
+          <div class="mini-title">Quick Summary</div>
+
+          <div class="summary-list">
+            <div class="summary-item">
+              <span>From</span>
+              <strong id="ticketFrom">N/A</strong>
+            </div>
+
+            <div class="summary-item">
+              <span>To</span>
+              <strong id="ticketTo">N/A</strong>
+            </div>
+
+            <div class="summary-item">
+              <span>Date</span>
+              <strong id="ticketDate">N/A</strong>
+            </div>
+
+            <div class="summary-item">
+              <span>Seat(s)</span>
+              <strong id="ticketSeats">N/A</strong>
+            </div>
+
+            <div class="summary-item">
+              <span>Total Fare</span>
+              <strong id="ticketTotal">₹0</strong>
+            </div>
+
+            <div class="summary-item">
+              <span>Payment Reference</span>
+              <strong id="ticketPaymentId">N/A</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="mini-title">Important Note</div>
+
+          <div class="important-note">
+            Once cancelled, this ticket will be marked as <b>CANCELLED</b> and a
+            cancellation email with attached cancelled ticket will be sent to your
+            registered email address.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="confirmation.js"></script>
+</body>
+</html>
