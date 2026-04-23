@@ -3,3 +3,9 @@ backend/node_modules/
 
 .env
 backend/.env
+
+ngrok.exe
+opening.txt
+.DS_Store
+BusTraveller/.DS_Store
+BusTraveller/.vscode/
