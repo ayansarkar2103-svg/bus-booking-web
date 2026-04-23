@@ -140,7 +140,7 @@ async function cancelTicket() {
       cancelBtn.innerText = "Cancelling...";
     }
 
-    const response = await fetch("http://localhost:5000/cancel-ticket", {
+    const response = await fetch("https://bus-booking-web-app-production.up.railway.app/cancel-ticket", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
