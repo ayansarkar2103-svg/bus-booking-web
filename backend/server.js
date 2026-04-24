@@ -1174,7 +1174,23 @@ app.get("/", (req, res) => {
   res.send("Bus booking backend is running...");
 });
 
+app.get("/test-email", async (req, res) => {
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      subject: "Test Email from Bus App",
+      text: "Email is working ✅",
+    });
+
+    res.json({ success: true, message: "Test email sent" });
+  } catch (err) {
+    console.log("Test email error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 // -----------------------------
+
 // START SERVER
 // -----------------------------
 app.listen(PORT, () => {
