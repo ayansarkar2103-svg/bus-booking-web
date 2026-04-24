@@ -45,7 +45,7 @@ const SEATER_PRICE = 500;
 const SLEEPER_PRICE = 900;
 const DEFAULT_OPERATOR = "Laxmi Holidays Express";
 const DEFAULT_BUS_TYPE = "Seater + Sleeper • Premium AC";
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://bus-booking-web-app-production.up.railway.app";
 
 if (seaterPriceEl) seaterPriceEl.innerText = SEATER_PRICE;
 if (sleeperPriceEl) sleeperPriceEl.innerText = SLEEPER_PRICE;

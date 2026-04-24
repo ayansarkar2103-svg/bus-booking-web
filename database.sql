@@ -1,14 +1,14 @@
-CREATE DATABASE bus_booking;
-
-USE bus_booking;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  firstName VARCHAR(50),
-  lastName VARCHAR(50),
+  first_name VARCHAR(50),
+  last_name VARCHAR(50),
   email VARCHAR(100) UNIQUE,
   password VARCHAR(100)
 );
+
+DROP TABLE IF EXISTS bookings;
 
 CREATE TABLE bookings (
   id INT AUTO_INCREMENT PRIMARY KEY,

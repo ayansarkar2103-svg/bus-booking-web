@@ -561,24 +561,34 @@ app.post("/login", (req, res) => {
 // SEAT + BOOKING ROUTES
 // -----------------------------
 app.get("/booked-seats", (req, res) => {
-  const { from, to, date } = req.query;
+  const { from, to, date, departureTime } = req.query;
 
   if (!from || !to || !date) {
     return res.json([]);
   }
 
-  const query = `
+  let query = `
     SELECT seats
     FROM bookings
-    WHERE from_city = ? AND to_city = ? AND journey_date = ? AND status = 'Confirmed'
+    WHERE from_city = ?
+      AND to_city = ?
+      AND travel_date = ?
+      AND booking_status = 'Confirmed'
   `;
 
-  db.query(query, [from, to, date], (err, result) => {
+  const params = [from, to, date];
+
+  if (departureTime) {
+    query += ` AND departure_time = ?`;
+    params.push(departureTime);
+  }
+
+  db.query(query, params, (err, result) => {
     if (err) {
       console.log("Booked seats DB error:", err);
       return res.status(500).json({
         success: false,
-        message: "Database error while loading booked seats",
+        message: "Database error while checking seats",
       });
     }
 
@@ -730,9 +740,7 @@ app.post("/book", async (req, res) => {
     } = req.body;
 
     if (
-      !email || !from || !to || !date || !seats || !payment_id || !order_id ||
-      !boarding_point || !dropping_point || !passenger_name || !passenger_age ||
-      !passenger_gender || !phone || !amount
+      !email || !from || !to || !date || !seats || !payment_id || !amount
     ) {
       return res.status(400).json({
         success: false,
@@ -745,13 +753,23 @@ app.post("/book", async (req, res) => {
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const checkSeatQuery = `
+    let checkSeatQuery = `
       SELECT seats
       FROM bookings
-      WHERE from_city = ? AND to_city = ? AND journey_date = ? AND status = 'Confirmed'
+      WHERE from_city = ?
+        AND to_city = ?
+        AND travel_date = ?
+        AND booking_status = 'Confirmed'
     `;
 
-    db.query(checkSeatQuery, [from, to, date], async (checkErr, checkRows) => {
+    const checkParams = [from, to, date];
+
+    if (departure_time) {
+      checkSeatQuery += ` AND departure_time = ?`;
+      checkParams.push(departure_time);
+    }
+
+    db.query(checkSeatQuery, checkParams, async (checkErr, checkRows) => {
       if (checkErr) {
         console.log("Seat check DB error:", checkErr);
         return res.status(500).json({
@@ -779,56 +797,30 @@ app.post("/book", async (req, res) => {
         });
       }
 
-      const ticketId = "LH" + Date.now().toString().slice(-6);
-
       const insertQuery = `
         INSERT INTO bookings (
-          ticket_id,
-          email,
+          user_email,
           from_city,
           to_city,
-          journey_date,
+          travel_date,
           seats,
-          payment_id,
-          order_id,
-          boarding_point,
-          dropping_point,
-          passenger_name,
-          passenger_age,
-          passenger_gender,
-          phone,
           amount,
-          operator_name,
-          bus_type,
-          departure_time,
-          arrival_time,
-          duration,
-          status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          payment_id,
+          booking_status,
+          departure_time
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       const values = [
-        ticketId,
-        email,
+        String(email).trim().toLowerCase(),
         from,
         to,
         date,
-        seats,
-        payment_id,
-        order_id,
-        boarding_point,
-        dropping_point,
-        passenger_name,
-        passenger_age,
-        passenger_gender,
-        phone,
+        seatList.join(", "),
         amount,
-        operator_name,
-        bus_type,
-        departure_time,
-        arrival_time,
-        duration,
+        payment_id,
         "Confirmed",
+        departure_time || null,
       ];
 
       db.query(insertQuery, values, async (insertErr) => {
@@ -841,26 +833,26 @@ app.post("/book", async (req, res) => {
         }
 
         const confirmedBooking = {
-          ticketId,
+          ticketId: payment_id,
           email,
           from,
           to,
           date,
           seats: seatList,
           paymentId: payment_id,
-          orderId: order_id,
-          boardingPoint: boarding_point,
-          droppingPoint: dropping_point,
-          name: passenger_name,
-          age: passenger_age,
-          gender: passenger_gender,
-          phone,
+          orderId: order_id || "",
+          boardingPoint: boarding_point || "Main Boarding Point",
+          droppingPoint: dropping_point || "Main Dropping Point",
+          name: passenger_name || "Passenger",
+          age: passenger_age || "",
+          gender: passenger_gender || "",
+          phone: phone || "",
           price: amount,
-          operatorName: operator_name,
-          busType: bus_type,
-          departureTime: departure_time,
-          arrivalTime: arrival_time,
-          duration,
+          operatorName: operator_name || "Laxmi Holidays Express",
+          busType: bus_type || "Seater + Sleeper • Premium AC",
+          departureTime: departure_time || "N/A",
+          arrivalTime: arrival_time || "N/A",
+          duration: duration || "N/A",
           status: "Confirmed",
         };
 
@@ -873,7 +865,7 @@ app.post("/book", async (req, res) => {
         return res.json({
           success: true,
           message: "Booking saved successfully",
-          ticketId,
+          ticketId: payment_id,
           confirmedBooking,
         });
       });
@@ -900,7 +892,7 @@ app.post("/send-ticket-email", async (req, res) => {
       seats: payload.seats,
       price: payload.total || payload.price || payload.amount,
       paymentId: payload.paymentId,
-      ticketId: payload.ticketId,
+      ticketId: payload.ticketId || payload.paymentId,
       boardingPoint: payload.boardingPoint,
       droppingPoint: payload.droppingPoint,
       operatorName: payload.operatorName || "Laxmi Holidays Express",
@@ -930,18 +922,19 @@ app.post("/send-ticket-email", async (req, res) => {
 // -----------------------------
 app.post("/cancel-ticket", async (req, res) => {
   try {
-    const { ticketId, email } = req.body;
+    const paymentId = req.body.paymentId || req.body.payment_id || req.body.ticketId;
+    const email = String(req.body.email || "").trim().toLowerCase();
 
-    if (!ticketId || !email) {
+    if (!paymentId || !email) {
       return res.status(400).json({
         success: false,
-        message: "Ticket ID and email are required",
+        message: "Payment ID and email are required",
       });
     }
 
     db.query(
-      "SELECT * FROM bookings WHERE ticket_id = ? AND email = ?",
-      [ticketId, email],
+      "SELECT * FROM bookings WHERE payment_id = ? AND user_email = ? LIMIT 1",
+      [paymentId, email],
       async (findErr, rows) => {
         if (findErr) {
           console.log("Find booking error:", findErr);
@@ -961,8 +954,8 @@ app.post("/cancel-ticket", async (req, res) => {
         const booking = rows[0];
 
         db.query(
-          "UPDATE bookings SET status = 'Cancelled' WHERE ticket_id = ?",
-          [ticketId],
+          "UPDATE bookings SET booking_status = 'Cancelled' WHERE payment_id = ? AND user_email = ?",
+          [paymentId, email],
           async (updateErr) => {
             if (updateErr) {
               console.log("Cancel update DB error:", updateErr);
@@ -973,22 +966,22 @@ app.post("/cancel-ticket", async (req, res) => {
             }
 
             const cancelBookingData = {
-              ticketId: booking.ticket_id,
-              email: booking.email,
+              ticketId: booking.payment_id,
+              email: booking.user_email,
               from: booking.from_city,
               to: booking.to_city,
-              date: booking.journey_date,
+              date: booking.travel_date,
               seats: booking.seats,
               price: booking.amount,
               paymentId: booking.payment_id,
-              boardingPoint: booking.boarding_point,
-              droppingPoint: booking.dropping_point,
-              name: booking.passenger_name,
-              operatorName: booking.operator_name,
-              busType: booking.bus_type,
-              departureTime: booking.departure_time,
-              arrivalTime: booking.arrival_time,
-              duration: booking.duration,
+              boardingPoint: req.body.boardingPoint || "Main Boarding Point",
+              droppingPoint: req.body.droppingPoint || "Main Dropping Point",
+              name: req.body.name || "Passenger",
+              operatorName: req.body.operatorName || "Laxmi Holidays Express",
+              busType: req.body.busType || "Seater + Sleeper • Premium AC",
+              departureTime: booking.departure_time || "N/A",
+              arrivalTime: req.body.arrivalTime || "N/A",
+              duration: req.body.duration || "N/A",
               status: "Cancelled",
             };
 
@@ -1030,30 +1023,19 @@ app.get("/my-bookings", (req, res) => {
 
   const query = `
     SELECT
-      ticket_id,
-      email,
+      id,
+      user_email,
       from_city,
       to_city,
-      journey_date,
+      travel_date,
       seats,
-      payment_id,
-      order_id,
-      boarding_point,
-      dropping_point,
-      passenger_name,
-      passenger_age,
-      passenger_gender,
-      phone,
       amount,
-      operator_name,
-      bus_type,
+      payment_id,
+      booking_status,
       departure_time,
-      arrival_time,
-      duration,
-      status,
       created_at
     FROM bookings
-    WHERE email = ?
+    WHERE user_email = ?
     ORDER BY created_at DESC
   `;
 
@@ -1066,9 +1048,23 @@ app.get("/my-bookings", (req, res) => {
       });
     }
 
+    const bookings = results.map((row) => ({
+      ticket_id: row.payment_id,
+      email: row.user_email,
+      from_city: row.from_city,
+      to_city: row.to_city,
+      journey_date: row.travel_date,
+      seats: row.seats,
+      payment_id: row.payment_id,
+      amount: row.amount,
+      status: row.booking_status,
+      departure_time: row.departure_time,
+      created_at: row.created_at,
+    }));
+
     return res.json({
       success: true,
-      bookings: results,
+      bookings,
     });
   });
 });
@@ -1089,7 +1085,7 @@ app.get("/download-ticket/:ticketId", (req, res) => {
   const query = `
     SELECT *
     FROM bookings
-    WHERE ticket_id = ?
+    WHERE payment_id = ?
     LIMIT 1
   `;
 
@@ -1113,34 +1109,34 @@ app.get("/download-ticket/:ticketId", (req, res) => {
       const booking = results[0];
 
       const ticketData = {
-        ticketId: booking.ticket_id,
-        email: booking.email,
-        name: booking.passenger_name,
+        ticketId: booking.payment_id,
+        email: booking.user_email,
+        name: "Passenger",
         from: booking.from_city,
         to: booking.to_city,
-        date: booking.journey_date,
+        date: booking.travel_date,
         seats: booking.seats,
         price: booking.amount,
         paymentId: booking.payment_id,
-        boardingPoint: booking.boarding_point,
-        droppingPoint: booking.dropping_point,
-        operatorName: booking.operator_name,
-        busType: booking.bus_type,
-        departureTime: booking.departure_time,
-        arrivalTime: booking.arrival_time,
-        duration: booking.duration,
-        status: booking.status || "Confirmed",
+        boardingPoint: "Main Boarding Point",
+        droppingPoint: "Main Dropping Point",
+        operatorName: "Laxmi Holidays Express",
+        busType: "Seater + Sleeper • Premium AC",
+        departureTime: booking.departure_time || "N/A",
+        arrivalTime: "N/A",
+        duration: "N/A",
+        status: booking.booking_status === "Cancelled" ? "CANCELLED" : "CONFIRMED",
       };
 
       const pdfBuffer = await generateTicketPDFBuffer(
         ticketData,
-        booking.status === "Cancelled" ? "CANCELLED" : "CONFIRMED"
+        booking.booking_status === "Cancelled" ? "CANCELLED" : "CONFIRMED"
       );
 
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
-        `attachment; filename="ticket-${booking.ticket_id}.pdf"`
+        `attachment; filename="ticket-${booking.payment_id}.pdf"`
       );
 
       return res.send(pdfBuffer);
