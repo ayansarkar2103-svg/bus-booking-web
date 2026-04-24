@@ -27,8 +27,8 @@ const razorpay = new Razorpay({
 // -----------------------------
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -1200,6 +1200,9 @@ app.get("/debug-email", (req, res) => {
     EMAIL_FROM: process.env.EMAIL_FROM,
     HAS_PASS: !!process.env.EMAIL_PASS
   });
+});
+app.get("/", (req, res) => {
+  res.send("Bus booking backend is running...");
 });
 // -----------------------------
 
