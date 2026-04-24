@@ -1243,6 +1243,9 @@ app.get("/debug-db", (req, res) => {
   });
 });
 
+// -----------------------------
+// DEBUG BOOKINGS ROUTE
+// -----------------------------
 app.get("/debug-bookings", (req, res) => {
   db.query("SELECT id, from_city, to_city, travel_date, seats, departure_time, booking_status FROM bookings ORDER BY id DESC LIMIT 10", (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
