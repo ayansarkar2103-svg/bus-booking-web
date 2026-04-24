@@ -798,41 +798,50 @@ app.post("/book", async (req, res) => {
       }
 
       const insertQuery = `
-        INSERT INTO bookings (
-          user_email,
-          from_city,
-          to_city,
-          travel_date,
-          seats,
-          amount,
-          payment_id,
-          booking_status,
-          departure_time,
-          boarding_point,
-dropping_point,
-passenger_name,
-          passenger_age,
-passenger_gender,
-phone,
-operator_name,
-bus_type,
-departure_time,
-arrival_time,
-            duration
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
+  INSERT INTO bookings (
+    user_email,
+    from_city,
+    to_city,
+    travel_date,
+    seats,
+    amount,
+    payment_id,
+    booking_status,
+    departure_time,
+    boarding_point,
+    dropping_point,
+    passenger_name,
+    passenger_age,
+    passenger_gender,
+    phone,
+    operator_name,
+    bus_type,
+    arrival_time,
+    duration
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
 
-      const values = [
-        String(email).trim().toLowerCase(),
-        from,
-        to,
-        date,
-        seatList.join(", "),
-        amount,
-        payment_id,
-        "Confirmed",
-        departure_time || null,
-      ];
+const values = [
+  String(email).trim().toLowerCase(),
+  from,
+  to,
+  date,
+  seatList.join(", "),
+  amount,
+  payment_id,
+  "Confirmed",
+  departure_time || null,
+  boarding_point || null,
+  dropping_point || null,
+  passenger_name || "Passenger",
+  passenger_age || null,
+  passenger_gender || null,
+  phone || null,
+  operator_name || "Laxmi Holidays Express",
+  bus_type || "Seater + Sleeper • Premium AC",
+  arrival_time || null,
+  duration || null,
+];
 
       db.query(insertQuery, values, async (insertErr) => {
         if (insertErr) {
