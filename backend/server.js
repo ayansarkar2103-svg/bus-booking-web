@@ -25,15 +25,6 @@ const razorpay = new Razorpay({
 // -----------------------------
 // EMAIL SETUP
 // -----------------------------
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 
 // -----------------------------
@@ -1191,45 +1182,51 @@ app.get("/download-ticket/:ticketId", (req, res) => {
 // -----------------------------
 app.get("/test-email", async (req, res) => {
   try {
-    await transporter.verify();
-
-    const info = await transporter.sendMail({
-      from: `"Laxmi Holidays" <${process.env.EMAIL_FROM}>`,
-      to: process.env.EMAIL_FROM,
-      subject: "Test Email from Bus App",
-      text: "Email is working ✅",
-    });
-
-    console.log("EMAIL SUCCESS:", info);
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "Laxmi Holidays",
+          email: process.env.EMAIL_FROM,
+        },
+        to: [{ email: process.env.EMAIL_FROM }],
+        subject: "Test Email from Bus App",
+        htmlContent: "<h2>Email is working ✅</h2><p>Brevo API email sent successfully.</p>",
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     res.json({
       success: true,
-      message: "Email sent",
+      message: "Email sent using Brevo API",
+      data: response.data,
     });
-
   } catch (err) {
-    console.log("EMAIL ERROR FULL:", err);
-
     res.status(500).json({
       success: false,
-      error: err.message,
-      code: err.code,
+      error: err.response?.data || err.message,
     });
   }
 });
- 
+
+// -----------------------------
+// debug
+// -----------------------------
 app.get("/debug-email", (req, res) => {
   res.json({
-    EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_FROM: process.env.EMAIL_FROM,
-    HAS_PASS: !!process.env.EMAIL_PASS
+    HAS_BREVO_API_KEY: !!process.env.BREVO_API_KEY,
   });
 });
+// -----------------------------
 app.get("/", (req, res) => {
   res.send("Bus booking backend is running...");
 });
-// -----------------------------
-
 // START SERVER
 // -----------------------------
 app.listen(PORT, () => {
