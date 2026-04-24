@@ -33,11 +33,7 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
 });
-
 
 
 // -----------------------------
@@ -431,7 +427,7 @@ async function sendBookingEmail(booking) {
   const pdfBuffer = await generateTicketPDFBuffer(booking, "CONFIRMED");
 
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: `"Laxmi Holidays" <${process.env.EMAIL_FROM}>`,
     to: booking.email,
     subject: "Booking Confirmed - Your Bus Ticket",
     html: confirmationEmailHTML(booking),
@@ -452,7 +448,7 @@ async function sendCancellationEmail(booking) {
   const pdfBuffer = await generateTicketPDFBuffer(booking, "CANCELLED");
 
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: `"Laxmi Holidays" <${process.env.EMAIL_FROM}>`,
     to: booking.email,
     subject: "Ticket Cancelled - Cancellation Confirmation",
     html: cancellationEmailHTML(booking),
@@ -1169,32 +1165,42 @@ app.get("/download-ticket/:ticketId", (req, res) => {
 // -----------------------------
 // TEST ROUTE
 // -----------------------------
-app.get("/", (req, res) => {
-  res.send("Bus booking backend is running...");
-});
-
 app.get("/test-email", async (req, res) => {
   try {
-    await transporter.sendMail({
+    await transporter.verify();
+
+    const info = await transporter.sendMail({
       from: `"Laxmi Holidays" <${process.env.EMAIL_FROM}>`,
-      to: "ayansarkar2103@gmail.com",
+      to: process.env.EMAIL_FROM,
       subject: "Test Email from Bus App",
       text: "Email is working ✅",
     });
 
-    res.json({ success: true, message: "Test email sent" });
+    console.log("EMAIL SUCCESS:", info);
+
+    res.json({
+      success: true,
+      message: "Email sent",
+    });
+
   } catch (err) {
-    console.log("Test email error:", err);
+    console.log("EMAIL ERROR FULL:", err);
+
     res.status(500).json({
       success: false,
       error: err.message,
       code: err.code,
-      command: err.command,
     });
   }
 });
-
-    
+ 
+app.get("/debug-email", (req, res) => {
+  res.json({
+    EMAIL_USER: process.env.EMAIL_USER,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+    HAS_PASS: !!process.env.EMAIL_PASS
+  });
+});
 // -----------------------------
 
 // START SERVER
