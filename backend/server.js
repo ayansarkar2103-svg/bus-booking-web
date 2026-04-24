@@ -1228,6 +1228,25 @@ app.get("/", (req, res) => {
   res.send("Bus booking backend is running...");
 });
 // START SERVER
+
+app.get("/debug-db", (req, res) => {
+  db.query("SELECT 1 AS test", (err, result) => {
+    if (err) {
+      console.log("DEBUG DB ERROR:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Database not connected",
+        error: err.message,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Database connected ✅",
+      result,
+    });
+  });
+});
 // -----------------------------
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

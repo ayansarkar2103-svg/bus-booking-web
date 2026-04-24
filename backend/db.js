@@ -1,14 +1,16 @@
 require("dotenv").config();
 const mysql = require("mysql2");
 
-const db = mysql.createConnection(process.env.MYSQL_PUBLIC_URL);
+// Railway gives full connection string
+const connection = mysql.createConnection(process.env.MYSQL_PUBLIC_URL);
 
-db.connect((err) => {
+connection.connect((err) => {
   if (err) {
-    console.log("DB Error:", err);
+    console.error("DB Connection Failed ❌", err);
   } else {
-    console.log("Connected to Railway MySQL ✅");
+    console.log("MySQL Connected ✅");
   }
 });
 
-module.exports = db;
+module.exports = connection;
+
