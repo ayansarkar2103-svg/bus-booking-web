@@ -4,7 +4,7 @@ const totalSeatsEl = document.getElementById("totalSeats");
 const upcomingTripsEl = document.getElementById("upcomingTrips");
 const userNameEl = document.getElementById("userName");
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://bus-booking-web-app-production.up.railway.app";
 
 function formatDate(dateStr) {
   if (!dateStr) return "N/A";
