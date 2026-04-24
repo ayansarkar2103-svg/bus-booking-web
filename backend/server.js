@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 const PDFDocument = require("pdfkit");
 const db = require("./db");
 
@@ -426,40 +426,64 @@ async function sendBookingEmail(booking) {
   ensureTicketId(booking);
   const pdfBuffer = await generateTicketPDFBuffer(booking, "CONFIRMED");
 
-  await transporter.sendMail({
-    from: `"Laxmi Holidays" <${process.env.EMAIL_FROM}>`,
-    to: booking.email,
-    subject: "Booking Confirmed - Your Bus Ticket",
-    html: confirmationEmailHTML(booking),
-    attachments: [
-      {
-        filename: `ticket-${booking.ticketId}.pdf`,
-        content: pdfBuffer,
-        contentType: "application/pdf",
+  const base64PDF = pdfBuffer.toString("base64");
+
+  await axios.post(
+    "https://api.brevo.com/v3/smtp/email",
+    {
+      sender: {
+        name: "Laxmi Holidays",
+        email: process.env.EMAIL_FROM,
       },
-    ],
-  });
+      to: [{ email: booking.email }],
+      subject: "Booking Confirmed - Your Bus Ticket",
+      htmlContent: confirmationEmailHTML(booking),
+      attachment: [
+        {
+          name: `ticket-${booking.ticketId}.pdf`,
+          content: base64PDF,
+        },
+      ],
+    },
+    {
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 }
 
 async function sendCancellationEmail(booking) {
-  if (!booking.email) throw new Error("Passenger email is missing.");
-
   ensureTicketId(booking);
   const pdfBuffer = await generateTicketPDFBuffer(booking, "CANCELLED");
 
-  await transporter.sendMail({
-    from: `"Laxmi Holidays" <${process.env.EMAIL_FROM}>`,
-    to: booking.email,
-    subject: "Ticket Cancelled - Cancellation Confirmation",
-    html: cancellationEmailHTML(booking),
-    attachments: [
-      {
-        filename: `cancelled-ticket-${booking.ticketId}.pdf`,
-        content: pdfBuffer,
-        contentType: "application/pdf",
+  const base64PDF = pdfBuffer.toString("base64");
+
+  await axios.post(
+    "https://api.brevo.com/v3/smtp/email",
+    {
+      sender: {
+        name: "Laxmi Holidays",
+        email: process.env.EMAIL_FROM,
       },
-    ],
-  });
+      to: [{ email: booking.email }],
+      subject: "Ticket Cancelled",
+      htmlContent: cancellationEmailHTML(booking),
+      attachment: [
+        {
+          name: `cancelled-${booking.ticketId}.pdf`,
+          content: base64PDF,
+        },
+      ],
+    },
+    {
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 }
 
 // -----------------------------
