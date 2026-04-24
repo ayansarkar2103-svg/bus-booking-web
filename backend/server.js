@@ -856,11 +856,9 @@ app.post("/book", async (req, res) => {
           status: "Confirmed",
         };
 
-        try {
-          await sendBookingEmail(confirmedBooking);
-        } catch (emailErr) {
+        sendBookingEmail(confirmedBooking).catch((emailErr) => {
           console.log("Booking email send error:", emailErr);
-        }
+        });
 
         return res.json({
           success: true,
