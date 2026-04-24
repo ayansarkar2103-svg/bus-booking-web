@@ -422,7 +422,7 @@ function createSeaterSeats() {
       seat.className = "seat";
       seat.innerText = seatNo;
 
-      if (bookedSeatSet.has(seatNo)) {
+      if (bookedSeatSet.has(seatNo.trim())) {
         seat.classList.add("booked");
       } else {
         seat.addEventListener("click", () => toggleSeat(seatNo, seat));
@@ -448,7 +448,7 @@ function createSleeperSeats() {
     sleeper.className = "sleeper-seat";
     sleeper.innerText = seatNo;
 
-    if (bookedSeatSet.has(seatNo)) {
+    if (bookedSeatSet.has(seatNo.trim())) {
       sleeper.classList.add("booked");
     } else {
       sleeper.addEventListener("click", () => toggleSeat(seatNo, sleeper));
