@@ -1173,8 +1173,8 @@ app.get("/", (req, res) => {
 app.get("/test-email", async (req, res) => {
   try {
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
+      from: `"Laxmi Holidays" <${process.env.EMAIL_USER}>`,
+      to: "ayansarkar2103@gmail.com",
       subject: "Test Email from Bus App",
       text: "Email is working ✅",
     });
