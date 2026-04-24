@@ -601,30 +601,25 @@ app.get("/booked-seats", (req, res) => {
     params.push(departureTime);
   }
 
-  db.query(query, params, (err, result) => {
+  db.query(query, params, (err, results) => {
     if (err) {
       console.log("Booked seats DB error:", err);
-      return res.status(500).json({
-        success: false,
-        message: "Database error while checking seats",
-      });
+      return res.status(500).json([]);
     }
 
-    const seats = [];
+    const bookedSeats = [];
 
-    result.forEach((row) => {
-      const splitSeats = String(row.seats || "")
+    results.forEach((row) => {
+      String(row.seats || "")
         .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-
-      seats.push(...splitSeats);
+        .map((seat) => seat.trim())
+        .filter(Boolean)
+        .forEach((seat) => bookedSeats.push(seat));
     });
 
-    return res.json(seats);
+    res.json(bookedSeats);
   });
 });
-
 // -----------------------------
 // PAYMENT ROUTES
 // -----------------------------
@@ -1245,6 +1240,13 @@ app.get("/debug-db", (req, res) => {
       message: "Database connected ✅",
       result,
     });
+  });
+});
+
+app.get("/debug-bookings", (req, res) => {
+  db.query("SELECT id, from_city, to_city, travel_date, seats, departure_time, booking_status FROM bookings ORDER BY id DESC LIMIT 10", (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
   });
 });
 // -----------------------------
