@@ -187,13 +187,26 @@ async function cancelBooking(ticketId) {
 
     alert("Ticket cancelled successfully ✅");
     loadMyBookings();
+    
   } catch (error) {
     console.error("Cancel booking error:", error);
     alert("Error cancelling booking ❌");
   }
 }
 
+
+
+function goToTrip() {
+  window.location.href = "trip.html";
+}
+
+function goToHome() {
+  window.location.href = "index.html";
+}
 window.cancelBooking = cancelBooking;
 window.downloadTicket = downloadTicket;
+window.goToTrip = goToTrip;
+window.goToHome = goToHome;
+
 
 loadMyBookings();
