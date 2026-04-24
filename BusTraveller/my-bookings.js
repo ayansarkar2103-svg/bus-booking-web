@@ -162,6 +162,9 @@ async function cancelBooking(ticketId) {
     return;
   }
 
+  const confirmCancel = confirm("Are you sure you want to cancel this ticket?");
+  if (!confirmCancel) return;
+
   try {
     const response = await fetch(`${API_BASE}/cancel-ticket`, {
       method: "POST",
@@ -169,15 +172,17 @@ async function cancelBooking(ticketId) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        ticketId,
-        email
+        paymentId: ticketId,
+        ticketId: ticketId,
+        email: email
       })
     });
 
     const data = await parseJsonResponse(response);
 
     if (!response.ok || !data.success) {
-      throw new Error(data.message || "Cancellation failed");
+      alert(data.message || "Cancellation failed ❌");
+      return;
     }
 
     alert("Ticket cancelled successfully ✅");
