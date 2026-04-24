@@ -181,7 +181,6 @@ async function cancelBooking(ticketId) {
     }
 
     alert("Ticket cancelled successfully ✅");
-    alert("Amount will be credited in next 3-5 working days ✅");
     loadMyBookings();
   } catch (error) {
     console.error("Cancel booking error:", error);
