@@ -807,7 +807,18 @@ app.post("/book", async (req, res) => {
           amount,
           payment_id,
           booking_status,
-          departure_time
+          departure_time,
+          boarding_point,
+dropping_point,
+passenger_name,
+          passenger_age,
+passenger_gender,
+phone,
+operator_name,
+bus_type,
+departure_time,
+arrival_time,
+            duration
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
@@ -1109,7 +1120,7 @@ app.get("/download-ticket/:ticketId", (req, res) => {
       const ticketData = {
         ticketId: booking.payment_id,
         email: booking.user_email,
-        name: "Passenger",
+        name: booking.passenger_name || "Passenger",
         from: booking.from_city,
         to: booking.to_city,
         date: booking.travel_date,
@@ -1121,8 +1132,8 @@ app.get("/download-ticket/:ticketId", (req, res) => {
         operatorName: "Laxmi Holidays Express",
         busType: "Seater + Sleeper • Premium AC",
         departureTime: booking.departure_time || "N/A",
-        arrivalTime: "N/A",
-        duration: "N/A",
+        arrivalTime: booking.arrival_time || "N/A",
+        duration:  booking.duration || "N/A",
         status: booking.booking_status === "Cancelled" ? "CANCELLED" : "CONFIRMED",
       };
 
