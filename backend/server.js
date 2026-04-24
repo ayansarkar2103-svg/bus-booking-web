@@ -1084,13 +1084,6 @@ app.get("/my-bookings", (req, res) => {
 app.get("/download-ticket/:ticketId", (req, res) => {
   const ticketId = req.params.ticketId;
 
-  if (!ticketId) {
-    return res.status(400).json({
-      success: false,
-      message: "Ticket ID is required",
-    });
-  }
-
   const query = `
     SELECT *
     FROM bookings
@@ -1101,17 +1094,11 @@ app.get("/download-ticket/:ticketId", (req, res) => {
   db.query(query, [ticketId], async (err, results) => {
     if (err) {
       console.log("Download ticket DB error:", err);
-      return res.status(500).json({
-        success: false,
-        message: "Database error",
-      });
+      return res.status(500).json({ success: false, message: "Database error" });
     }
 
     if (results.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Ticket not found",
-      });
+      return res.status(404).json({ success: false, message: "Ticket not found" });
     }
 
     try {
@@ -1127,14 +1114,18 @@ app.get("/download-ticket/:ticketId", (req, res) => {
         seats: booking.seats,
         price: booking.amount,
         paymentId: booking.payment_id,
+
         boardingPoint: booking.boarding_point || "N/A",
         droppingPoint: booking.dropping_point || "N/A",
-        operatorName: "Laxmi Holidays Express",
-        busType: "Seater + Sleeper • Premium AC",
+
+        operatorName: booking.operator_name || "Laxmi Holidays Express",
+        busType: booking.bus_type || "Seater + Sleeper • Premium AC",
+
         departureTime: booking.departure_time || "N/A",
         arrivalTime: booking.arrival_time || "N/A",
-        duration:  booking.duration || "N/A",
-        status: booking.booking_status === "Cancelled" ? "CANCELLED" : "CONFIRMED",
+        duration: booking.duration || "N/A",
+
+        status: booking.booking_status || "Confirmed",
       };
 
       const pdfBuffer = await generateTicketPDFBuffer(
