@@ -556,10 +556,8 @@ async function loadBookedSeats() {
   }
 
   try {
-    const departureTime = busInfo.departure || "";
-
     const res = await fetch(
-      `${API_BASE}/booked-seats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}&departureTime=${encodeURIComponent(departureTime)}`
+      `${API_BASE}/booked-seats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}`
     );
 
     const bookedSeats = await parseJsonResponse(res);
