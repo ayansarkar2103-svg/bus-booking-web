@@ -581,13 +581,13 @@ async function loadBookedSeats() {
 }
 
 function loadSelectedRoute() {
-  const savedFrom = localStorage.getItem("selectedFrom");
-  const savedTo = localStorage.getItem("selectedTo");
-  const savedDate = localStorage.getItem("selectedDate");
+  const savedFrom = localStorage.getItem("selectedFrom") || "Chandigarh";
+  const savedTo = localStorage.getItem("selectedTo") || "Manali";
+  const savedDate = localStorage.getItem("selectedDate") || "2026-04-24";
 
-  if (savedFrom && fromInput) fromInput.value = savedFrom;
-  if (savedTo && toInput) toInput.value = savedTo;
-  if (savedDate && dateInput) dateInput.value = savedDate;
+  if (fromInput) fromInput.value = savedFrom;
+  if (toInput) toInput.value = savedTo;
+  if (dateInput) dateInput.value = savedDate;
 
   const fullName = localStorage.getItem("name");
   if (fullName && passengerNameInput) passengerNameInput.value = fullName;
@@ -596,7 +596,10 @@ function loadSelectedRoute() {
   updateBoardingDroppingPoints();
   updateFormSummary();
   updateSelectionUI();
-  loadBookedSeats();
+
+  setTimeout(() => {
+    loadBookedSeats();
+  }, 300);
 }
 
 function validateBookingForm() {
