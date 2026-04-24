@@ -544,6 +544,8 @@ async function loadBookedSeats() {
   const date = dateInput?.value || "";
 
   updateRouteUI();
+  updateBusInfo();
+
   bookedSeatSet = new Set();
 
   if (!from || !to || !date) {
@@ -554,11 +556,15 @@ async function loadBookedSeats() {
   }
 
   try {
+    const departureTime = busInfo.departure || "";
+
     const res = await fetch(
-      `${API_BASE}/booked-seats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}`
+      `${API_BASE}/booked-seats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${encodeURIComponent(date)}&departureTime=${encodeURIComponent(departureTime)}`
     );
 
     const bookedSeats = await parseJsonResponse(res);
+
+    console.log("Booked seats from DB:", bookedSeats);
 
     if (Array.isArray(bookedSeats)) {
       bookedSeats.forEach((seat) => bookedSeatSet.add(String(seat).trim()));
@@ -837,6 +843,7 @@ if (boardingInput) {
   boardingInput.addEventListener("change", () => {
     updateFormSummary();
     updateBusInfo();
+    loadBookedSeats();
   });
 }
 
@@ -844,6 +851,7 @@ if (droppingInput) {
   droppingInput.addEventListener("change", () => {
     updateFormSummary();
     updateBusInfo();
+    loadBookedSeats();
   });
 }
 

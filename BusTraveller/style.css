@@ -699,3 +699,11 @@ padding-block: 8rem;
     gap: 2rem;
   }
 }
+.seat.booked,
+.sleeper-seat.booked {
+  background: #9ca3af !important;
+  color: white !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  opacity: 0.7;
+}
