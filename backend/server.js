@@ -33,6 +33,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 
@@ -1173,7 +1176,7 @@ app.get("/", (req, res) => {
 app.get("/test-email", async (req, res) => {
   try {
     await transporter.sendMail({
-      from: `"Laxmi Holidays" <${process.env.EMAIL_USER}>`,
+      from: `"Laxmi Holidays" <${process.env.EMAIL_FROM}>`,
       to: "ayansarkar2103@gmail.com",
       subject: "Test Email from Bus App",
       text: "Email is working ✅",
@@ -1182,9 +1185,16 @@ app.get("/test-email", async (req, res) => {
     res.json({ success: true, message: "Test email sent" });
   } catch (err) {
     console.log("Test email error:", err);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      code: err.code,
+      command: err.command,
+    });
   }
 });
+
+    
 // -----------------------------
 
 // START SERVER
