@@ -8,10 +8,12 @@ Razorpay Payment Integration
 Ticket PDF Download
 Email Confirmation & Cancellation
 My Bookings Dashboard
+
 🛠 Tech Stack
 Frontend: HTML, CSS, JavaScript
 Backend: Node.js, Express.js
 Database: MySQL
+
 🚀 Run Locally
 cd backend
 npm install
