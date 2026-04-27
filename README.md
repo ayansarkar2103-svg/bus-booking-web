@@ -2,12 +2,6 @@
 
 A full-stack bus booking system where users can search buses, select seats, make payments, download tickets, and manage bookings.
 
----
-
-## 🚀 Live Demo
-
-🔗 **Frontend:** Add your Vercel link here  
-🔗 **Backend API:** Add your Railway link here  
 
 ---
 
